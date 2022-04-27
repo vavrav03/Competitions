@@ -1,0 +1,57 @@
+\documentclass[a4paper,12pt]{article}
+
+\addtolength{\topmargin}{-1.1in}
+\setlength\textheight{265mm}
+\setlength\textwidth{165mm}
+\setlength\oddsidemargin{-2mm}
+\setlength\evensidemargin{-2mm}
+\usepackage[czech]{babel}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,textcomp}
+
+\def\author{Vladimír Vávra}
+
+\begin{document}
+\pagestyle{plain}
+\noindent
+\textbf{P-I-3 Střelec \hfill \author}
+\vspace{0.5cm}
+
+\paragraph{Princip řešení:}
+Na první pohled by úloha mohla svádět k prohledávání do hloubky. Uvážíme-li ovšem, kolik možných zanoření by proběhlo, rychle dojdeme k závěru, že i pro relativně malá vstupní data by program nemohl pokračovat, jelikož by program měl exponenciální složitost. 
+
+V takových případech často úloha vede na dynamické programování. Při něm je první krok k nalezení řešení zjistit si, jaký by byl výsledek pro prvních několik nejjednodušších pod-úloh. 
+
+Vezměme si tu nejjednodušší. Máme šachovnici písmen RxS, avšak slovo, které máme vybrat je jednopísmenné. Takový výsledek by prostý součet všech výskytů tohoto písmena. Jestliže bychom přidali druhé písmeno, museli bychom při přeskočení na toto písmeno nejprve navštívit předchozí písmeno. Pozice těchto dvou písmen tedy musí být v jedné diagonále. Stejně jako jsme v předchozí pod-úloze nalezli všechna možná první písmena, nyní nalezneme všechna druhá písmena. Nyní sečteme, kolika možnými způsoby je možné se na toto písmeno dostat. Jedná se o součet, kolika možnostmi je možné se dostat na předchozí písmena dostupné po diagonálách k dané pozici. To je nyní vždy jedna, jelikož se jedná o počáteční písmena slova. Toto uděláme pro každý výskyt druhého písmena. Součet těchto výsledků je celkový počet možností, jak poskládat slovo. 
+
+Pro další písmeno bychom udělali to samé. Vyhledáme všechny výskyty a spočítáme, kolika způsoby je možné dostat se toto místo z předchozích písmen. Sečteme tedy počty možností, jak se dostat na všechna předchozí písmena dostupná z této pozice. Toto můžeme opakovat pro N písmen.
+
+\paragraph{Popis algoritmu:}
+Datové struktury:
+\begin{itemize}
+   \item Pole A: RxS, kde jsou uložena písmena
+   \item pole B: RxS, kde je uložen počet možností, jak se dostat na toto písmeno (na začátku všude 0). Datový typ bude celočíselný o dostatečném rozsahu (BigInteger)
+\end{itemize}
+Algoritmus: 
+\begin{enumerate}
+   \item Najdi všechny výskyty prvního písmena v poli A a ulož do pole B na stejný index 1
+   \item Opakuj pro všechna zbylá písmena ve slově
+   \begin{enumerate}
+      \item Procházej celé pole A dokud nenajdeš aktuálně hledané písmeno na indexu (i, j)
+      \item Projdi všechny možné pozice na diagonálách. V případě, že se na nějaké z nich nachází předchozí písmeno (x, y), udělej operaci B[i, j] += B[x, y];
+      \item Zpět na krok (a), dokud nebude projité celé pole A
+   \end{enumerate}
+   \item Výsledkem je součet čísel v poli B na indexech, kde se v poli A nachází poslední písmena hledaného slova. Ten zmodulujeme číslem $10^{9} + 7$ a získáme tak náš výsledek
+\end{enumerate}
+
+\paragraph{Paměťová složitost:}
+Potřebujeme dvě pole o velikosti šachovnice, takže: O(2*R*S)
+
+\paragraph{Časová složitost:} Celkem musíme uskutečnit celkem N kroků v bloku 2 (bereme jako součást část 1). V každém z těchto N kroků musíme projít celé pole RxS a pokaždé, kdy narazíme na nějaké písmeno, které je aktuální, musíme projít diagonály. Projetí diagonál trvá nejhůře 2*min(R,S). V nejhorším případě budou všechna písmena v nějaký čas aktuální, takže celkově procházení diagonál zabere R*S*2*min(R, S).
+
+Nejhorší časová složitost tedy bude v součtu: \\$O(N*R*S + R*S*2*min(R, S)) = O(R*S*(N+2*min(R, S)))$
+
+\end{document}
+
